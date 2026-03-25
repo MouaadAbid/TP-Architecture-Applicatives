@@ -1,3 +1,5 @@
+from collections.abc import Iterable, Iterator
+
 class Student:
     def __init__(self, name, grade1, grade2, grade3):
         self.name = name
@@ -12,21 +14,34 @@ class Student:
         return f"{self.name} - Notes: ({self.grade1}, {self.grade2}, {self.grade3}) - Moyenne: {self.average():.2f}"
 
 
-class SchoolClass:
+class SchoolClassIterator(Iterator):
+    def __init__(self, students):
+        # On trie directement par matière 1 décroissante
+        self.students = sorted(students, key=lambda s: s.grade1, reverse=True)
+        self.index = 0
+
+    def __next__(self):
+        if self.index >= len(self.students):
+            raise StopIteration
+        student = self.students[self.index]
+        self.index += 1
+        return student
+
+
+class SchoolClass(Iterable):
     def __init__(self):
         self.students = []
 
     def add_student(self, student):
         self.students.append(student)
 
+    # ancienne méthode de tri pour référence (pas obligatoire maintenant)
     def rank_matter_1(self):
         return sorted(self.students, key=lambda s: s.grade1, reverse=True)
 
-    def rank_matter_2(self):
-        return sorted(self.students, key=lambda s: s.grade2, reverse=True)
-
-    def rank_matter_3(self):
-        return sorted(self.students, key=lambda s: s.grade3, reverse=True)
+    # Implémentation de Iterable
+    def __iter__(self):
+        return SchoolClassIterator(self.students)
 
 
 # ===== TEST =====
@@ -37,14 +52,6 @@ if __name__ == "__main__":
     school_class.add_student(Student('A', 8, 2, 17))
     school_class.add_student(Student('V', 9, 14, 14))
 
-    print("=== Classement matière 1 ===")
-    for s in school_class.rank_matter_1():
-        print(s)
-
-    print("\n=== Classement matière 2 ===")
-    for s in school_class.rank_matter_2():
-        print(s)
-
-    print("\n=== Classement matière 3 ===")
-    for s in school_class.rank_matter_3():
-        print(s)
+    print("=== Iteration sur les étudiants (matière 1 décroissante) ===")
+    for student in school_class:
+        print(student)
