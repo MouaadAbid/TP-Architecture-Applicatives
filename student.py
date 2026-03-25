@@ -12,9 +12,22 @@ class Student:
         return f"{self.name} - Notes: ({self.grade1}, {self.grade2}, {self.grade3}) - Moyenne: {self.average():.2f}"
 
 
-class Classroom:
+class SchoolClass:
     def __init__(self):
         self.students = []
 
     def add_student(self, student):
         self.students.append(student)
+
+
+# ===== TEST =====
+if __name__ == "__main__":
+    school_class = SchoolClass()
+
+    school_class.add_student(Student('J', 10, 12, 13))
+    school_class.add_student(Student('A', 8, 2, 17))
+    school_class.add_student(Student('V', 9, 14, 14))
+
+    # affichage simple pour vérifier
+    for student in school_class.students:
+        print(student)
