@@ -51,9 +51,18 @@ class SchoolClassIterator(Iterator):
         return student
 
 
-# ===== Classe SchoolClass =====
-@add_iterator_for_subject4
-class SchoolClass(Iterable):
+# ===== Métaclasse Singleton =====
+class SingletonMeta(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            instance = super().__call__(*args, **kwargs)
+            cls._instances[cls] = instance
+        return cls._instances[cls]
+
+
+# ===== SchoolClass Singleton =====
+class SchoolClass(Iterable, metaclass=SingletonMeta):
     def __init__(self):
         self.students = []
 
@@ -69,15 +78,24 @@ class SchoolClass(Iterable):
     def iter_matter_3(self):
         return SchoolClassIterator(self.students, subject=3)
 
+    def iter_matter_4(self):
+        return SchoolClassIterator(self.students, subject=4)
+
 
 # ===== TEST =====
 if __name__ == "__main__":
-    school_class = SchoolClass()
+    # Création de deux instances
+    class1 = SchoolClass()
+    class2 = SchoolClass()
 
-    school_class.add_student(Student('J', 10, 12, 13))
-    school_class.add_student(Student('A', 8, 2, 17))
-    school_class.add_student(Student('V', 9, 14, 14))
+    # Vérification que ce sont bien la même instance
+    print(f"class1 is class2 ? {class1 is class2}")
 
-    print("=== Iteration matière 4 via décorateur ===")
-    for student in school_class.iter_matter_4():
+    # Ajouter des étudiants via class1
+    class1.add_student(Student('J', 10, 12, 13))
+    class1.add_student(Student('A', 8, 2, 17))
+    class1.add_student(Student('V', 9, 14, 14))
+
+    print("\n=== Iteration matière 4 (Singleton) ===")
+    for student in class2.iter_matter_4():  # on utilise class2, même instance
         print(student)
