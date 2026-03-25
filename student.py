@@ -1,14 +1,12 @@
 from collections.abc import Iterable, Iterator
 
-# ===== Décorateur pour ajouter une 4ème matière =====
-def add_subject4(default_grade=0):
+# ===== Décorateur pour ajouter grade4 =====
+def add_subject4(default_grade=15):
     def decorator(cls):
         original_init = cls.__init__
-
         def new_init(self, *args, **kwargs):
             original_init(self, *args, **kwargs)
-            self.grade4 = default_grade  # ajout de la 4ème note
-
+            self.grade4 = default_grade
         cls.__init__ = new_init
         return cls
     return decorator
@@ -32,7 +30,7 @@ class Student:
 # ===== Itérateur générique =====
 class SchoolClassIterator(Iterator):
     def __init__(self, students, subject):
-        self.subject = subject  # 1,2,3,4
+        self.subject = subject
         if subject == 1:
             self.students = sorted(students, key=lambda s: s.grade1, reverse=True)
         elif subject == 2:
@@ -53,6 +51,8 @@ class SchoolClassIterator(Iterator):
         return student
 
 
+# ===== Classe SchoolClass =====
+@add_iterator_for_subject4
 class SchoolClass(Iterable):
     def __init__(self):
         self.students = []
@@ -69,9 +69,6 @@ class SchoolClass(Iterable):
     def iter_matter_3(self):
         return SchoolClassIterator(self.students, subject=3)
 
-    def iter_matter_4(self):
-        return SchoolClassIterator(self.students, subject=4)
-
 
 # ===== TEST =====
 if __name__ == "__main__":
@@ -81,6 +78,6 @@ if __name__ == "__main__":
     school_class.add_student(Student('A', 8, 2, 17))
     school_class.add_student(Student('V', 9, 14, 14))
 
-    print("=== Iteration matière 4 (nouvelle matière via décorateur) ===")
+    print("=== Iteration matière 4 via décorateur ===")
     for student in school_class.iter_matter_4():
         print(student)
